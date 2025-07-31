@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>ইউজার তালিকা</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f2f2f2;
+      padding: 30px;
+    }
+    h2 {
+      text-align: center;
+    }
+    table {
+      margin: 0 auto;
+      width: 80%;
+      border-collapse: collapse;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+    }
+    th, td {
+      padding: 12px;
+      border-bottom: 1px solid #ccc;
+      text-align: center;
+    }
+    th {
+      background-color: #4CAF50;
+      color: white;
+    }
+    .btn-delete {
+      background: crimson;
+      color: white;
+      border: none;
+      padding: 5px 10px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h2>🧾 ইউজার তালিকা</h2>
+  <table id="userTable">
+    <thead>
+      <tr>
+        <th>নাম</th>
+        <th>ইমেইল</th>
+        <th>মোবাইল</th>
+        <th>ডিলিট</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <script>
+    function loadUsers() {
+      fetch('http://localhost:3000/users')
+        .then(res => res.json())
+        .then(users => {
+          const tbody = document.querySelector("#userTable tbody");
+          tbody.innerHTML = "";
+          users.forEach(user => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>${user.name}</td>
+              <td>${user.email}</td>
+              <td>${user.number}</td>
+              <td><button class="btn-delete" onclick="deleteUser('${user.email}')">🗑️ Delete</button></td>
+            `;
+            tbody.appendChild(row);
+          });
+        });
+    }
+
+    function deleteUser(email) {
+      if (!confirm("আপনি কি সত্যিই মুছতে চান?")) return;
+      fetch('http://localhost:3000/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email })
+      })
+      .then(res => res.text())
+      .then(msg => {
+        alert(msg);
+        loadUsers();
+      });
+    }
+
+    loadUsers();
+  </script>
+</body>
+</html>
